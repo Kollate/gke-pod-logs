@@ -1,9 +1,6 @@
 import { Logging } from "@google-cloud/logging";
-import config from "#root/config";
 
-const logging = new Logging({
-  projectId: config.PROJECT_ID,
-});
+const logging = new Logging({});
 
 type Params = {
   namespace: string;
