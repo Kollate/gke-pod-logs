@@ -1,0 +1,13 @@
+src/generated/**.ts
+# package directories
+/node_modules
+
+# Serverless directories
+.serverless
+
+# Environment files
+.env
+
+/dist
+/coverage
+.DS_Store

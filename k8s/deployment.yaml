@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tekton-log-viewer
+  namespace: devops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tekton-log-viewer
+  template:
+    metadata:
+      labels:
+        app: tekton-log-viewer
+    spec:
+      securityContext:
+        seccompProfile:
+          type: "RuntimeDefault"
+      containers:
+        - name: app
+          securityContext:
+            runAsUser: 2000
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - ALL
+          image: gcr.io/kollate-218719/tekton-log-viewer:latest
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: PORT
+              value: "8080"
+            - name: NODE_ENV
+              value: "production"
+            - name: NODE_OPTIONS
+              value: "--unhandled-rejections=warn"
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /secret/key.json
+          livenessProbe:
+            httpGet:
+              port: 8080 # must be same as container port
+              path: /healthz
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            failureThreshold: 3
+            timeoutSeconds: 3
+          resources:
+            limits:
+              cpu: 100m
+              memory: 256Mi
+            requests:
+              cpu: 0m
+              memory: 0Mi
+          volumeMounts:
+            - name: cloudbuild
+              mountPath: /secret
+      volumes:
+        - name: cloudbuild
+          secret:
+            secretName: cloudbuild
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tekton-log-viewer
+  namespace: devops
+spec:
+  selector:
+    app: tekton-log-viewer
+  ports:
+    - port: 80
+      targetPort: 8080
+      name: http-app
+      protocol: TCP
+---
+

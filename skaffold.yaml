@@ -1,0 +1,15 @@
+apiVersion: skaffold/v3
+kind: Config
+build:
+  tagPolicy:
+    sha256: {}
+  artifacts:
+    - image: gcr.io/kollate-218719/tekton-log-viewer
+      context: ./
+      docker:
+        cacheFrom:
+          - gcr.io/kollate-218719/tekton-log-viewer
+  local: {}
+deploy:
+  statusCheckDeadlineSeconds: 600
+  kubectl: {}
