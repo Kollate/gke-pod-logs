@@ -17,7 +17,7 @@ export const router = (app: express.Application) => {
       namespace: req.params.namespace,
       pod: req.params.pod,
     });
-    res.status(200).send(result);
+    res.status(200).contentType("text/plain").send(result);
   });
 };
 // };
